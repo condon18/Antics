@@ -54,12 +54,38 @@ class AIPlayer(Player):
     #       If setup phase 2: list of two 2-tuples of ints -> [(x1,y1), (x2,y2)]
     ##
     def getPlacement(self, currentState):
-       if currentState.phase == SETUP_PHASE_1:
-           return [(0,0), (9,0), (0,2), (1,2), (2,2), (4,2), (5,2), (6,2), (7,2), (8,2), (9,2)]
-       elif currentState.phase == SETUP_PHASE_2:
-           moves = []
-            
-    
+        if currentState.phase == SETUP_PHASE_1:
+            return [(0,0), (9,0), (0,2), (1,2), (2,2), (4,2), (5,2), (6,2), (7,2), (8,2), (9,2)]
+        elif currentState.phase == SETUP_PHASE_2:
+            foodPoints = [(0,6), (0,7)]
+            for a in range(0,2):
+                emptyCells = []
+                tunnel = (0,0)
+                for x in range(0,10):
+                    for y in range(6,10):
+                        if currentState.board[x][y].constr == None:
+                            emptyCells.append((x,y))
+                        elif currentState.board[x][y].constr == TUNNEL:
+                            tunnel = (x,y)
+
+                for i in range(0, len(emptyCells)):
+                    if self.getDistance(self, tunnel, emptyCells[i]) >= self.getDistance(self, tunnel, foodPoints[a]):
+                        foodPoints[a] = emptyCells[i]
+                currentState.board[foodPoints[a].x][foodPoints[a].y].constr = True
+
+            return foodPoints
+
+        return [(0,0)]
+
+    ##
+    #getDistance
+    #Description:finds the raw distance between two cells
+    def getDistance(self, src, dst):
+        differenceX = abs(src.x - dst.x)
+        differenceY = abs(src.y - dst.y)
+        return differenceX + differenceY
+
+
     ##
     #getMove
     #Description: The getMove method corresponds to the play phase of the game 
